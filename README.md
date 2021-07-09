@@ -1,7 +1,8 @@
 # coding-list
 
 ## 镜像
-[GitHub](https://github.com/xrz-cloud/coding-list)  
+[GitHub](https://github.com/xrz-cloud/coding-list)(推荐)  
+[Gitee](https://gitee.com/xrz-cloud/coding-list)  
 [CODING](https://xrzyun.coding.net/public/xrz-video/coding-list/git/files)  
 
 ## 目录
@@ -49,7 +50,7 @@ git clone https://github.com/xrz-cloud/coding-list
 这里建议开一个新用户，以保证子账号权限泄露后不会被滥用，影响其他数据，不在意的话，请跳过。
 
 <details>
-<summary>开新用户方法</summary>
+<summary><strong>开新用户方法</strong>(点击这段文字展开)</summary>
 
 点击右上角的【团队管理】>【成员管理】>【齿轮图标】>【新建子用户】  
 ![1](docs/img/1.png)  
@@ -133,7 +134,7 @@ No framework detected. Default Project Settings:
 描述可以识别JSON或文本，若直接输入文本，则在顶部显示此文本，与
 
 ```json
-{“textarea”:{"top":"${你输入的文本}","bottom":""}}
+{"textarea":{"top":"${你输入的文本}","bottom":""}}
 ```
 
 这段JSON等价。  
