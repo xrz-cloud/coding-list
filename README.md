@@ -55,7 +55,7 @@ git clone https://github.com/xrz-cloud/coding-list
 点击右上角的【团队管理】>【成员管理】>【齿轮图标】>【新建子用户】  
 ![1](docs/img/1.png)  
 跳转至腾讯云，用 [CODING]/[原先绑定CODING的腾讯云] 的账号密码登录。  
-【快速创建子用户】
+【快速创建子用户】  
 ![2](docs/img/2.png)  
 再打开的界面中按引导设置,创建子用户。  
 ![3](docs/img/3.png)  
