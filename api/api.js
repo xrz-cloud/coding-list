@@ -1,10 +1,11 @@
 const fetch = require('node-fetch')
 const token = '把这一串中文改为令牌，不要删引号'
+const ProjectName = "把这一串中文改为项目名，不要删引号"
 const api = "https://e.coding.net/open-api"
 
 exports.getFile = async (id) => {
   id = Number(id)
-  const data = { "Action": "DescribeIssueFileUrl", "ProjectName": "xrz-video", "FileId": id }
+  const data = { "Action": "DescribeIssueFileUrl", "ProjectName": ProjectName, "FileId": id }
   const res = await fetch(`${api}`, {
     body: JSON.stringify(data),
     method: 'POST',
@@ -19,7 +20,7 @@ exports.getFile = async (id) => {
 
 exports.getIssue = async (code) => {
   code = Number(code)
-  const data = { "Action": "DescribeIssue", "ProjectName": "xrz-video", "IssueCode": code }
+  const data = { "Action": "DescribeIssue", "ProjectName": ProjectName, "IssueCode": code }
   const res = await fetch(`${api}`, {
     body: JSON.stringify(data),
     method: 'POST',

@@ -75,8 +75,8 @@ git clone https://github.com/xrz-cloud/coding-list
 建议勾选`project:file`,`project:issue`以保证以后继续可用，但现在全不勾选的权限也够用了（玄学，所以这里的精细权限设置只能靠新建子用户了）。  
 复制新建的令牌。  
 
-3.修改配置文件  
-打开克隆下来的文件夹，找到`api/api.js`,在第2行`token`后填写刚才新建的令牌。  
+3.修改配置文件(若对名词不了解，请查阅[CODING帮助](https://help.coding.net))  
+打开克隆下来的文件夹，找到`api/api.js`,在第2行`token`后填写刚才新建的令牌；在第3行`ProjectName`后填写你创建事项所在的项目名称。  
 找到`web/js/coding-list-app.js`，在第15行`coding_hostname`后填写你的CODING团队域名；在第16行`title`后填写你想要的网站标题；  
 第23到50行是网站首页配置， 其中第29行`Description`是页面上下的文字，详细配置见[描述](#描述)；31行起的`SubTasks`是子项目，可视为文件夹，`Code`请填想要引导至的IssueCode，`Name`请填想要的文件夹名。  
 
