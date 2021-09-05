@@ -88,8 +88,8 @@
       "destination": "/web/html/coding-list-app"
     },
     {
-      "source": "/coding/list/api",
-      "destination": "/api/list"
+      "source": "/init",
+      "destination": "/web/html/init"
     }
   ]
 }

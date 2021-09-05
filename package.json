@@ -9,6 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "node-fetch": "^2.6.1"
+    "@ltd/j-toml": "^1.12.2",
+    "fs": "^0.0.1-security",
+    "node-fetch": "^2.6.1",
+    "path": "^0.12.7"
   }
 }

@@ -1,17 +1,15 @@
 const fetch = require('node-fetch')
-const token = '把这一串中文改为令牌，不要删引号'
-const ProjectName = "把这一串中文改为项目名，不要删引号"
-const api = "https://e.coding.net/open-api"
+const coding_api = "https://e.coding.net/open-api"
 
 exports.getFile = async (id) => {
   id = Number(id)
-  const data = { "Action": "DescribeIssueFileUrl", "ProjectName": ProjectName, "FileId": id }
-  const res = await fetch(`${api}`, {
+  const data = { "Action": "DescribeIssueFileUrl", "ProjectName": "xrz-video", "FileId": id }
+  const res = await fetch(`${coding_api}`, {
     body: JSON.stringify(data),
     method: 'POST',
     headers: {
       'content-type': 'application/json',
-      Authorization: `token ${token}`,
+      Authorization: `token ${process.env.coding_token}`,
     },
   })
   if (res.ok) return await res.json()
@@ -20,13 +18,25 @@ exports.getFile = async (id) => {
 
 exports.getIssue = async (code) => {
   code = Number(code)
-  const data = { "Action": "DescribeIssue", "ProjectName": ProjectName, "IssueCode": code }
-  const res = await fetch(`${api}`, {
+  const data = { "Action": "DescribeIssue", "ProjectName": "xrz-video", "IssueCode": code }
+  const res = await fetch(`${coding_api}`, {
     body: JSON.stringify(data),
     method: 'POST',
     headers: {
       'content-type': 'application/json',
-      Authorization: `token ${token}`,
+      Authorization: `token ${process.env.coding_token}`,
+    },
+  })
+  if (res.ok) return await res.json()
+  else console.error(res.statusText)
+}
+
+exports.oauth = async (data) => {
+  const res = await fetch(`https://${data.team}.coding.net/api/oauth/access_token`, {
+    body: `client_id=${data.data.client_id}&client_secret=${data.data.client_secret}&code=${data.data.code}&grant_type=${data.data.grant_type}`,
+    method: 'POST',
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded'
     },
   })
   if (res.ok) return await res.json()
@@ -34,12 +44,25 @@ exports.getIssue = async (code) => {
 }
 
 exports.allAPI = async (data) => {
-  const res = await fetch(`${api}`, {
+  const res = await fetch(`${coding_api}`, {
     body: `${data}`,
     method: 'POST',
     headers: {
       'content-type': 'application/json',
-      Authorization: `token ${token}`,
+      Authorization: `token ${process.env.coding_token}`,
+    },
+  })
+  if (res.ok) return await res.json()
+  else console.error(res.statusText)
+}
+
+exports.PublicAPIServer = async (data) => {
+  const res = await fetch(`${coding_api}`, {
+    body: `${data.body}`,
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      Authorization: `${data.token_type} ${data.token}`,
     },
   })
   if (res.ok) return await res.json()
