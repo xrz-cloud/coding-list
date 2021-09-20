@@ -3,11 +3,19 @@ const {
 } = require('./api')
 
 async function handler(req, res) {
-  let {
-    body,
-    token_type,
-    token
-  } = req.query
+  if (req.method == "POST") {
+    var {
+      body,
+      token_type,
+      token
+    } = JSON.parse(req.body)
+  } else {
+    var {
+      body,
+      token_type,
+      token
+    } = req.query
+  }
   const root = {
     "status": 200,
     "RequestId": "",
@@ -24,11 +32,25 @@ async function handler(req, res) {
     no_param["msg"] = "缺少token"
     res.send(no_param)
   } else {
-    const data = await PublicAPIServer({
-      "body": decodeURIComponent(body),
-      "token_type": token_type,
-      "token": token
-    })
+    let data
+    if (req.method == "POST") {
+      data = await PublicAPIServer({
+        "body": body,
+        "token_type": token_type,
+        "token": token
+      })
+    } else {
+      data = await PublicAPIServer({
+        "body": decodeURIComponent(body),
+        "token_type": token_type,
+        "token": token
+      })
+      console.log({
+        "body": decodeURIComponent(body),
+        "token_type": token_type,
+        "token": token
+      })
+    }
     const RequestId = data.Response.RequestId
     if (data.Response) {
       const info = root

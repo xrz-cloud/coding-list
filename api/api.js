@@ -3,7 +3,11 @@ const coding_api = "https://e.coding.net/open-api"
 
 exports.getFile = async (id) => {
   id = Number(id)
-  const data = { "Action": "DescribeIssueFileUrl", "ProjectName": "xrz-video", "FileId": id }
+  const data = {
+    "Action": "DescribeIssueFileUrl",
+    "ProjectName": process.env.coding_ProjectName,
+    "FileId": id
+  }
   const res = await fetch(`${coding_api}`, {
     body: JSON.stringify(data),
     method: 'POST',
@@ -18,7 +22,30 @@ exports.getFile = async (id) => {
 
 exports.getIssue = async (code) => {
   code = Number(code)
-  const data = { "Action": "DescribeIssue", "ProjectName": "xrz-video", "IssueCode": code }
+  const data = {
+    "Action": "DescribeIssue",
+    "ProjectName": process.env.coding_ProjectName,
+    "IssueCode": code
+  }
+  const res = await fetch(`${coding_api}`, {
+    body: JSON.stringify(data),
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      Authorization: `token ${process.env.coding_token}`,
+    },
+  })
+  if (res.ok) return await res.json()
+  else console.error(res.statusText)
+}
+
+exports.getConf = async () => {
+  const data = {
+    "Action": "DescribeWiki",
+    "ProjectName": process.env.coding_ProjectName,
+    "Iid": 2,
+    "VersionId": -1
+  }
   const res = await fetch(`${coding_api}`, {
     body: JSON.stringify(data),
     method: 'POST',

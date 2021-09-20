@@ -1,6 +1,19 @@
+async function conf() {
+  let ClistConfig = await fetch("/api/VCAPI")
+  ClistConfig = await ClistConfig.json()
+  ClistConfig = ClistConfig.info.conf
+  ClistConfig = toml.parse(ClistConfig)
+  ClistConfig["index"]["msg"]["Description"] = JSON.stringify(ClistConfig.index.msg.Description)
+  Cookies.set("conf", JSON.stringify(ClistConfig), {
+    "expires": new Date(Date.now() + Number(ClistConfig.refresh)),
+    "path": "/"
+  })
+  console.log("提示：", "已成功获取配置信息。可使用reconf()函数立即刷新配置。")
+  console.log("本次获取到的配置：", ClistConfig)
+}
 //API配置
 const api = {
-  "list": "/coding/list/api",
+  "list": "/coding/list",
   "file": "/coding/file"
 }
 //参数获取
@@ -8,19 +21,31 @@ const code = new URLSearchParams(location.search).get("code")
 const fileid = new URLSearchParams(location.search).get("id")
 //美化配置 https://github.com/badrap/bar-of-progress#customization [进度条]
 const theme = "#a685e2"
-const progress = new barOfProgress({ color: theme, delay: 50 })
+const progress = new barOfProgress({
+  color: theme,
+  delay: 50
+})
 //其它参数
 const isIndex = code == 0
 
-const coding_hostname = "e.coding.net"//填写你的CODING团队域名
-const title = "xxx的文件分享"//填写你想要的网站标题
+//const coding_hostname = "e.coding.net"//填写你的CODING团队域名
+
+const title = (function () {
+  if (!!Cookies.get("conf") == true) {
+    return JSON.parse(Cookies.get("conf")).title
+  }
+}()) || "CODING-LIST | 文件分享" //填写你想要的网站标题
 
 const prefetches = new Set()
 const loadScriptList = new Set()
 const loadStyleList = new Set()
 
 //主页项目
-const index = {
+const index = (function () {
+  if (!!Cookies.get("conf") == true) {
+    return JSON.parse(Cookies.get("conf")).index
+  }
+}()) || {
   "status": 200,
   "RequestId": "null",
   "msg": {
@@ -28,8 +53,7 @@ const index = {
     "Name": "INDEX",
     "Description": "{\"textarea\":{\"top\":\"欢迎访问CODING-LIST文件分享！<br>本分享程序文件储存于CODING提供的腾讯云COS对象存储。<br>稳定性有保障(bushi\",\"bottom\":\"本程序开源于GitHub <a href='//github.com/xrz-cloud/coding-list' target='_blank'>跳转</a>\"}}",
     "Files": [],
-    "SubTasks": [
-      {
+    "SubTasks": [{
         "Code": 190,
         "Type": "SUB_TASK",
         "Name": "2021.4"
@@ -48,6 +72,8 @@ const index = {
     "Parent": 404
   }
 }
+
+/*const index = */
 
 //下面的不要乱改---------------------------------------------
 //函数部分 开始
@@ -134,6 +160,7 @@ function loadScript(url, callback, crossorigin = true, async = true) {
     document.head.appendChild(script)
   })
 }
+
 function loadStyle(url, callback, crossorigin = true) {
   if (loadStyleList.has(url)) {
     if (callback) setTimeout(callback(), 0)
@@ -198,17 +225,17 @@ function getIconClass(name) {
 }
 
 function formatSize(s = 0) {
-  return s < 1024
-    ? s + ' B'
-    : s < Math.pow(1024, 2)
-      ? parseFloat(s / Math.pow(1024, 1)).toFixed(1) + ' KiB'
-      : s < Math.pow(1024, 3)
-        ? parseFloat(s / Math.pow(1024, 2)).toFixed(1) + ' MiB'
-        : s < Math.pow(1024, 4)
-          ? parseFloat(s / Math.pow(1024, 3)).toFixed(1) + ' GiB'
-          : s < Math.pow(1024, 5)
-            ? parseFloat(s / Math.pow(1024, 4)).toFixed(1) + ' TiB'
-            : '> 1PiB'
+  return s < 1024 ?
+    s + ' B' :
+    s < Math.pow(1024, 2) ?
+    parseFloat(s / Math.pow(1024, 1)).toFixed(1) + ' KiB' :
+    s < Math.pow(1024, 3) ?
+    parseFloat(s / Math.pow(1024, 2)).toFixed(1) + ' MiB' :
+    s < Math.pow(1024, 4) ?
+    parseFloat(s / Math.pow(1024, 3)).toFixed(1) + ' GiB' :
+    s < Math.pow(1024, 5) ?
+    parseFloat(s / Math.pow(1024, 4)).toFixed(1) + ' TiB' :
+    '> 1PiB'
 }
 
 const pushHtml = (s, dl_url, show_dl_btn = true, p = '1rem 1rem') => {
@@ -225,7 +252,9 @@ const list_load = async (code) => {
   let data = await res.json()
   if (data.msg.Parent == 404) ParentCode = 0
   else if (data.msg.Parent.Code) ParentCode = data.msg.Parent.Code
-  let { Description } = data.msg
+  let {
+    Description
+  } = data.msg
   Description = Description.toString()
   Description = Description.replace(/\\/g, '')
   let list
@@ -239,13 +268,20 @@ const list_load = async (code) => {
   let breadcrumb = `<a href="?code=0">🚩 Home</a>`
   if (data.msg.Type != "SUB_TASK") {
     for (item of data.msg.SubTasks) {
-      const { Code, Name } = item
+      const {
+        Code,
+        Name
+      } = item
       list += `<div class="item">
         <i class="far fa-folder"></i>${Name}<div style="flex-grow: 1"></div>
         <a href="?code=${Code}" data-name="${Name}" data-type="folder">${Name}</a></div>`
     }
     for (item of data.msg.Files) {
-      const { Name, Size, Url } = item
+      const {
+        Name,
+        Size,
+        Url
+      } = item
       list += `<div class="item">
         <i class="${getIconClass(Name)}"></i>${Name}<div style="flex-grow: 1"></div>
         <span class="size">${formatSize(Size)}</span>
@@ -255,7 +291,11 @@ const list_load = async (code) => {
   }
   if (data.msg.Type == "SUB_TASK") {
     for (item of data.msg.Files) {
-      const { Name, Size, Url } = item
+      const {
+        Name,
+        Size,
+        Url
+      } = item
       list += `<div class="item">
         <i class="${getIconClass(Name)}"></i>${Name}<div style="flex-grow: 1"></div>
         <span class="size">${formatSize(Size)}</span>
@@ -331,7 +371,9 @@ const fileINFO_load = async (fileid) => {
             let pic = ''
             let lrc = ''
             for (const i of search) {
-              const { title = '', author = '' } = i
+              const {
+                title = '', author = ''
+              } = i
               const title_match = new RegExp(title.replace(/[^0-9a-zA-Z一-鿋ぁ-ヶ가-힝]+/gi, '').slice(0, 2), 'gi').test(filename.replace(/[^0-9a-zA-Z一-鿋ぁ-ヶ가-힝]+/gi, ''))
               const author_match = new RegExp(author.replace(/[^0-9a-zA-Z一-鿋ぁ-ヶ가-힝]+/gi, '').slice(0, 2), 'gi').test(filename.replace(/[^0-9a-zA-Z一-鿋ぁ-ヶ가-힝]+/gi, ''))
               // console.log(title.replace(/[^0-9a-zA-Z一-鿋ぁ-ヶ가-힝]+/gi, '').slice(0, 2), '->', filename.replace(/[^0-9a-zA-Z一-鿋ぁ-ヶ가-힝]+/gi, ''))
@@ -389,7 +431,9 @@ function index_load() {
   let list = ""
   if (index.msg.Parent == 404) ParentCode = 0
   else if (index.msg.Parent.Code) ParentCode = index.msg.Parent.Code
-  let { Description } = index.msg
+  let {
+    Description
+  } = index.msg
   Description = Description.toString()
   Description = Description.replace(/\\/g, '')
   if (typeJSONorTXT(Description) == false) list = `<div style="padding: 1rem 1rem;"><div class="markdown-body" style="margin-top: 0; letter-spacing: .5px;"><p>${Description}</p></div></div>`
@@ -400,13 +444,20 @@ function index_load() {
   }
   if (index.msg.Type != "SUB_TASK") {
     for (item of index.msg.SubTasks) {
-      const { Code, Name } = item
+      const {
+        Code,
+        Name
+      } = item
       list += `<div class="item">
         <i class="far fa-folder"></i>${Name}<div style="flex-grow: 1"></div>
         <a href="?code=${Code}" data-name="${Name}" data-type="folder">${Name}</a></div>`
     }
     for (item of index.msg.Files) {
-      const { Name, Size, Url } = item
+      const {
+        Name,
+        Size,
+        Url
+      } = item
       list += `<div class="item">
         <i class="${getIconClass(Name)}"></i>${Name}<div style="flex-grow: 1"></div>
         <span class="size">${formatSize(Size)}</span>
@@ -415,7 +466,11 @@ function index_load() {
   }
   if (index.msg.Type == "SUB_TASK") {
     for (item of index.msg.Files) {
-      const { Name, Size, Url } = item
+      const {
+        Name,
+        Size,
+        Url
+      } = item
       list += `<div class="item">
         <i class="${getIconClass(Name)}"></i>${Name}<div style="flex-grow: 1"></div>
         <span class="size">${formatSize(Size)}</span>
@@ -432,13 +487,27 @@ function index_load() {
 }
 
 progress.start()
-document.title = title
-document.getElementById("navbar_title").innerHTML = title
 
-if (code == 0) window.location = "/"
-else if (code) list_load(code)
-
-if (!code) {
-  if (!fileid) index_load()
-  else if (fileid) fileINFO_load(fileid)
+function reconf() {
+  Cookies.remove("conf")
+  conf()
 }
+
+(async function LoadBase() {
+  if (!!Cookies.get("conf") == false) {
+    await conf()
+    LoadBase()
+  } else if (!!Cookies.get("conf") == true) {
+    //加载标题
+    document.title = title
+    document.getElementById("navbar_title").innerHTML = title
+    //载入首页/文件夹
+    if (code == 0) window.location = "/"
+    else if (code && !!Cookies.get("conf") == true) list_load(code)
+    //载入首页/文件
+    if (!code) {
+      if (!fileid) index_load()
+      else if (fileid && !!Cookies.get("conf") == true) fileINFO_load(fileid)
+    }
+  }
+}())

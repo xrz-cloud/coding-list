@@ -194,12 +194,6 @@ function LoadStep4() {
     <input id="coding_token" class="mdui-textfield-input" required/>
     <div class="mdui-textfield-error">CODING TOKEN 不能为空</div>
   </div>
-  打开<a href="https://vercel.com/account/tokens" target="_blank">此链接</a>，点击<code>Creat</code>，在弹出框中填写token名(随便写)，点击框选项<code>CREAT TOKEN</code>，复制弹出TOKEN值，填入下框。<br>
-  <div class="mdui-textfield mdui-textfield-floating-label">
-    <label class="mdui-textfield-label">Vercel TOKEN</label>
-    <input id="vercel_token" class="mdui-textfield-input" required/>
-    <div class="mdui-textfield-error">Vercel TOKEN 不能为空</div>
-  </div>
   <div class="mdui-textfield mdui-textfield-floating-label">
     <label class="mdui-textfield-label">网站标题</label>
     <input id="title" class="mdui-textfield-input" value="xxx的文件分享" required/>
@@ -210,97 +204,17 @@ function LoadStep4() {
 }
 
 async function InStep4(action = "GP", id = undefined) {
-  let coding_token, vercel_token, title
-  if (document.getElementById("coding_token") && document.getElementById("vercel_token") && document.getElementById("title")) {
+  let coding_token, title
+  if (document.getElementById("coding_token") && document.getElementById("title")) {
     coding_token = document.getElementById("coding_token").value
-    vercel_token = document.getElementById("vercel_token").value
     title = document.getElementById("title").value
     localStorage.setItem("coding_token", coding_token)
-    localStorage.setItem("vercel_token", vercel_token)
     localStorage.setItem("title", title)
   } else {
     coding_token = localStorage.getItem("coding_token") || document.getElementById("coding_token").value
-    vercel_token = localStorage.getItem("vercel_token") || document.getElementById("vercel_token").value
     title = localStorage.getItem("title") || document.getElementById("title").value
   }
-  document.getElementById("TBCS").innerHTML = `<div class="mdui-progress">
-  <div class="mdui-progress-indeterminate"></div>
-  </div>`
-  if (action == "GP") {
-    localStorage.setItem("coding_token", coding_token)
-    localStorage.setItem("vercel_token", vercel_token)
-    localStorage.setItem("title", title)
-    coding_token = localStorage.getItem("coding_token") || document.getElementById("coding_token").value
-    vercel_token = localStorage.getItem("vercel_token") || document.getElementById("vercel_token").value
-    title = localStorage.getItem("title") || document.getElementById("title").value
-    let GP = await fetch('https://api.vercel.com/v8/projects/', {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${vercel_token}`,
-      }
-    })
-    GP = await GP.json()
-    if (GP.projects && GP.pagination) {
-      let tbody = ""
-      for (var i = 0; i < GP.pagination.count; i++) {
-        tbody += `<tr onclick="InStep4('EV','${GP["projects"][i]["id"]}')">
-          <td>${i+1}</td>
-          <td>${GP["projects"][i]["name"]}</td>
-          <td>${GP["projects"][i]["id"]}</td>
-        </tr>`
-      }
-      document.getElementById("TBCS").innerHTML = `请选择你想要使用的项目，点击那个项目即可。<br>
-      <div class="mdui-table-fluid"><table class="mdui-table mdui-table-hoverable">
-      <thead><tr>
-        <th>#</th>
-        <th>项目名称</th>
-        <th>项目ID</th>
-      </tr></thead>
-      <tbody>${tbody}</tbody>
-      </table></div>`
-    }
-  }
-  if (action == "EV" && id) {
-    let GPEV = await fetch(`https://api.vercel.com/v8/projects/${id}/env?decrypt=true`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${vercel_token}`,
-      }
-    })
-    GPEV = await GPEV.json()
-    if (GPEV.envs) {
-      for (var i = 0; i < GPEV.envs.length; i++) {
-        await fetch(`https://api.vercel.com/v8/projects/${id}/env/${GPEV["envs"][i]["id"]}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${vercel_token}`,
-          }
-        })
-      }
-      let CPEV_title = await fetch(`https://api.vercel.com/v8/projects/${id}/env`, {
-        body: `{"type": "encrypted","key": "title","value": "${title}","target": ["production","preview","development"]}`,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${vercel_token}`,
-        }
-      })
-      CPEV_title = await CPEV_title.json()
-      let CPEV_coding_token = await fetch(`https://api.vercel.com/v8/projects/${id}/env`, {
-        body: `{"type": "encrypted","key": "coding_token","value": "${coding_token}","target": ["production","preview","development"]}`,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${vercel_token}`,
-        }
-      })
-      CPEV_coding_token = await CPEV_coding_token.json()
-      if (CPEV_title.id && CPEV_coding_token.id) {
-        document.getElementById("TBCS").innerHTML=`现在，请务必打开<a href="https://vercel.com/dashboard">Vercel</a>，找到部署此网站的项目，`
-        LoadStep5()
-      }
-    }
-  }
+  LoadStep5()
   return false
 }
 
@@ -436,12 +350,18 @@ async function InStep5_done() {
   }
 }
 
-function LoadStep6() {
+async function LoadStep6() {
+  let VCV = await fetch("/api/VCAPI") 
+  VCV = await VCV.json()
+  title = VCV.info.title
+  PN = VCV.info.PN
   window.location.hash = "#user-content-step6"
   TBC.innerHTML = `<h2 id="user-content-step6">第六步<small>完成&帮助</small></h2>
   <p>恭喜，到目前为止，所有基础配置已完成，本程序已经可以使用。<a href="/">点我前往首页</a><br>
   你可以在CodingList项目中找到WIKI的#2，并按照帮助对其进行配置的修改。(我们使用 TOML v4.0 作为配置文件，<a href="https://toml.io/cn/v0.4.0" target="_blank">语法参考</a>)<br>
-  也可以在本程序的管理界面进行图形化管理。</p>
+  也可以在本程序的管理界面进行图形化管理。<br>
+  重要检测：<code>${title}</code>是否是你的网站名;<code>${PN}</code>是否是你的CODING项目名。<br>
+  如果不是，请尝试到Vercel重新部署此项目。否则，会导致网站无法正常使用（包括子项目文件无法加载等）</p>
     <div class="mdui-bottom-nav mdui-bottom-nav-scroll-hide">
       <div class="mdui-row-xs-2">
         <div class="mdui-col">
