@@ -33,18 +33,18 @@
 2. 第三步`Configure Project`时，点击`Required Environment Variables`展开，按照如下设置(下面还要用)：
 `coding_token`:用子账户(如果在创建了的话)(可以用主账户)([创建TOKEN及子账号参考](https://github.com/xrz-cloud/coding-list/tree/917e1500ffc24fa92e5c17e8b0204ea21f82ca3c#2%E9%85%8D%E7%BD%AE%E5%8F%82%E6%95%B0))新建一个TOKEN。
 提示：令牌描述可以随便填。建议权限勾选project:file,project:issue以保证以后继续可用，但现在全不勾选的权限也够用了（玄学，所以这里的精细权限设置只能靠新建子用户了）。
-请复制创建的TOKEN并填入下框。
-`coding_ProjectName`:你想要创建项目的名称，建议填`clist`
-`title`:你网站想要的名字（可选）
+请复制创建的TOKEN并填入下框。  
+`coding_ProjectName`:你想要创建项目的名称，建议填`clist`  
+`title`:你网站想要的名字（可选）  
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fxrz-cloud%2Fcoding-list&env=coding_token,coding_ProjectName,title&project-name=clist&repo-name=clist)
 
 #### 2.配置(从零开始)
 
-1. 请打开部署得到的网站，在域名后加上`/init`来初始化。
-Demo:
-网站主页`https://coding-list-ac6f.vercel.app`
-初始化界面`gttps://coding-list-ac6f.vercel.app/init`
+1. 请打开部署得到的网站，在域名后加上`/init`来初始化。  
+Demo:  
+网站主页`https://coding-list-ac6f.vercel.app`  
+初始化界面`https://coding-list-ac6f.vercel.app/init`  
 
 2. 第三步创建项目时，项目名称请填上文中的`coding_ProjectName`，项目标识随意，但不能与已有CODING项目标识重复。
 
