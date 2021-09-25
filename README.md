@@ -64,6 +64,7 @@ Demo:
   - [修改描述](#修改描述)
   - [附件](#附件)
   - [子工作项](#子工作项)
+  - [自定义跳转](#自定义跳转)
 
 ### INDEX首页加载项
 
@@ -104,7 +105,7 @@ Demo:
 
 #### 以CODING事项作为首页
 
-打开`web/js/coding-list-app.js`，找到第505行，修改`"/"`为`"?code=把我改为一个IssueCode"`。  
+打开`web/js/coding-list-app.js`，找到第522行，修改`"/"`为`"?code=把我改为一个IssueCode"`。  
 原文件：  
 
 ```js
@@ -121,7 +122,7 @@ if (code == 0) window.location = "?code=81"
 
 #### 进度条颜色
 
-打开`web/js/coding-list-app.js`，找到第23行，修改
+打开`web/js/coding-list-app.js`，找到第11行，修改
 
 ```js
 const theme = "#a685e2"
@@ -146,6 +147,19 @@ CODING后台中，若要使用JSON配置，请不要转义，否则可能会导�
 #### 子工作项
 
 文件夹功能就是靠此实现的，你可以在子工作项中上传附件，即在子文件夹中浏览文件。  
+
+#### 自定义跳转
+
+找到项目WIKI的#2（ClistConfig），找到在`[share]`，并配置链接，即可。  
+默认有一条
+
+```
+github_repo = 'https://github.com/xrz-cloud/coding-list'
+```
+
+，即输入`https://网址/?share=github_repo`就跳转至`https://github.com/xrz-cloud/coding-list`。
+
+写法请参照[TOML v0.4.0](https://toml.io/cn/v0.4.0)标准。
 
 ## 信息
 

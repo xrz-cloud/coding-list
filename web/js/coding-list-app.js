@@ -1,23 +1,11 @@
-async function conf() {
-  let ClistConfig = await fetch("/api/VCAPI")
-  ClistConfig = await ClistConfig.json()
-  ClistConfig = ClistConfig.info.conf
-  ClistConfig = toml.parse(ClistConfig)
-  ClistConfig["index"]["msg"]["Description"] = JSON.stringify(ClistConfig.index.msg.Description)
-  Cookies.set("conf", JSON.stringify(ClistConfig), {
-    "expires": new Date(Date.now() + Number(ClistConfig.refresh)),
-    "path": "/"
-  })
-  console.log("提示：", "已成功获取配置信息。可使用reconf()函数立即刷新配置。")
-  console.log("本次获取到的配置：", ClistConfig)
-}
-//API配置
+//API配置========
 const api = {
   "list": "/coding/list",
   "file": "/coding/file"
 }
-//参数获取
+//参数获取==========
 const code = new URLSearchParams(location.search).get("code")
+const share = new URLSearchParams(location.search).get("share")
 const fileid = new URLSearchParams(location.search).get("id")
 //美化配置 https://github.com/badrap/bar-of-progress#customization [进度条]
 const theme = "#a685e2"
@@ -25,55 +13,24 @@ const progress = new barOfProgress({
   color: theme,
   delay: 50
 })
-//其它参数
+//其它参数============
 const isIndex = code == 0
+let title = (function () {
+    if (!!Cookies.get("conf") == true) {
+      return JSON.parse(Cookies.get("conf")).title
+    }
+  }()),
+  index = (function () {
+    if (!!Cookies.get("conf") == true) {
+      return JSON.parse(Cookies.get("conf")).index
+    }
+  }())
 
 //const coding_hostname = "e.coding.net"//填写你的CODING团队域名
-
-const title = (function () {
-  if (!!Cookies.get("conf") == true) {
-    return JSON.parse(Cookies.get("conf")).title
-  }
-}()) || "CODING-LIST | 文件分享" //填写你想要的网站标题
 
 const prefetches = new Set()
 const loadScriptList = new Set()
 const loadStyleList = new Set()
-
-//主页项目
-const index = (function () {
-  if (!!Cookies.get("conf") == true) {
-    return JSON.parse(Cookies.get("conf")).index
-  }
-}()) || {
-  "status": 200,
-  "RequestId": "null",
-  "msg": {
-    "Type": "MISSION",
-    "Name": "INDEX",
-    "Description": "{\"textarea\":{\"top\":\"欢迎访问CODING-LIST文件分享！<br>本分享程序文件储存于CODING提供的腾讯云COS对象存储。<br>稳定性有保障(bushi\",\"bottom\":\"本程序开源于GitHub <a href='//github.com/xrz-cloud/coding-list' target='_blank'>跳转</a>\"}}",
-    "Files": [],
-    "SubTasks": [{
-        "Code": 190,
-        "Type": "SUB_TASK",
-        "Name": "2021.4"
-      },
-      {
-        "Code": 151,
-        "Type": "SUB_TASK",
-        "Name": "2021.1"
-      },
-      {
-        "Code": 107,
-        "Type": "SUB_TASK",
-        "Name": "2020.10(部分在下面的文件夹)"
-      }
-    ],
-    "Parent": 404
-  }
-}
-
-/*const index = */
 
 //下面的不要乱改---------------------------------------------
 //函数部分 开始
@@ -486,28 +443,97 @@ function index_load() {
   }, 500);
 }
 
-progress.start()
+function ShareJump(token) {
+  const allShare = (function () {
+    if (!!Cookies.get("conf") == true) {
+      return JSON.parse(Cookies.get("conf")).share
+    }
+  }())
+  if (allShare[token]) window.location = allShare[token]
+  else alert("传入分享参数错误，请检查或删除Cookie重试。\n实验性功能：控制台输入 reconf() 重试。")
+}
+
+async function conf() {
+  let ClistConfig = await fetch("/api/VCAPI")
+  ClistConfig = await ClistConfig.json()
+  ClistConfig = ClistConfig.info.conf
+  ClistConfig = toml.parse(ClistConfig)
+  ClistConfig["index"]["msg"]["Description"] = JSON.stringify(ClistConfig.index.msg.Description)
+  Cookies.set("conf", JSON.stringify(ClistConfig), {
+    "expires": new Date(Date.now() + Number(ClistConfig.refresh)),
+    "path": "/"
+  })
+  console.log("提示：", "已成功获取配置信息。可使用reconf()函数立即刷新配置。")
+  console.log("本次获取到的配置：", ClistConfig)
+  //配置区=========================
+  //标题=============
+  title = (function () {
+    if (!!Cookies.get("conf") == true) {
+      return JSON.parse(Cookies.get("conf")).title
+    }
+  }()) || "CODING-LIST | 文件分享" //填写你想要的网站标题
+  //主页项目=============
+  index = (function () {
+    if (!!Cookies.get("conf") == true) {
+      return JSON.parse(Cookies.get("conf")).index
+    }
+  }()) || {
+    "status": 200,
+    "RequestId": "null",
+    "msg": {
+      "Type": "MISSION",
+      "Name": "INDEX",
+      "Description": "{\"textarea\":{\"top\":\"你刚刚成功获取到了数据，但由于未知原因没有加载，请刷新本页以加载。<br><a onclick='location.reload()'>点我</a>或随意点击下方项目都可以刷新。\",\"bottom\":\"欢迎访问CODING-LIST文件分享！<br>本分享程序文件储存于CODING提供的腾讯云COS对象存储。<br>稳定性有保障(bushi<br>本程序开源于GitHub <a href='//github.com/xrz-cloud/coding-list' target='_blank'>跳转</a>\"}}",
+      "Files": [],
+      "SubTasks": [{
+          "Code": 0,
+          "Type": "SUB_TASK",
+          "Name": "示例1"
+        },
+        {
+          "Code": 0,
+          "Type": "SUB_TASK",
+          "Name": "示例2"
+        },
+        {
+          "Code": 0,
+          "Type": "SUB_TASK",
+          "Name": "示例3(点击前往首页)"
+        }
+      ],
+      "Parent": 404
+    }
+  }
+}
 
 function reconf() {
   Cookies.remove("conf")
   conf()
 }
 
-(async function LoadBase() {
-  if (!!Cookies.get("conf") == false) {
-    await conf()
-    LoadBase()
-  } else if (!!Cookies.get("conf") == true) {
+progress.start()
+
+function LoadBase() {
+  if (!!Cookies.get("conf") == true) {
     //加载标题
     document.title = title
     document.getElementById("navbar_title").innerHTML = title
     //载入首页/文件夹
     if (code == 0) window.location = "/"
     else if (code && !!Cookies.get("conf") == true) list_load(code)
-    //载入首页/文件
-    if (!code) {
+    //载入分享
+    if (!code && share && !!Cookies.get("conf") == true) ShareJump(share)
+    //载入首页/文件 下面的if不要加else
+    if (!code && !share) {
       if (!fileid) index_load()
       else if (fileid && !!Cookies.get("conf") == true) fileINFO_load(fileid)
     }
   }
+}
+
+(async function () {
+  if (!!Cookies.get("conf") == false) {
+    await conf()
+    LoadBase()
+  } else LoadBase()
 }())

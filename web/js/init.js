@@ -358,7 +358,7 @@ async function LoadStep6() {
   window.location.hash = "#user-content-step6"
   TBC.innerHTML = `<h2 id="user-content-step6">第六步<small>完成&帮助</small></h2>
   <p>恭喜，到目前为止，所有基础配置已完成，本程序已经可以使用。<a href="/">点我前往首页</a><br>
-  你可以在CodingList项目中找到WIKI的#2，并按照帮助对其进行配置的修改。(我们使用 TOML v4.0 作为配置文件，<a href="https://toml.io/cn/v0.4.0" target="_blank">语法参考</a>)<br>
+  你可以在CodingList项目中找到WIKI的#2，并按照帮助对其进行配置的修改。(我们使用 TOML v0.4.0 作为配置文件，<a href="https://toml.io/cn/v0.4.0" target="_blank">语法参考</a>)<br>
   也可以在本程序的管理界面进行图形化管理。<br>
   重要检测：<code>${title}</code>是否是你的网站名;<code>${PN}</code>是否是你的CODING项目名。<br>
   如果不是，请尝试到Vercel重新部署此项目。否则，会导致网站无法正常使用（包括子项目文件无法加载等）</p>
